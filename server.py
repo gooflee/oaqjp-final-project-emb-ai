@@ -7,22 +7,27 @@ app = Flask("Emotion Detection")
 def emotionDetector():
     """ recieve text to process and send it to watson and return formated string """
 
-    text_to_analyze = request.args.get("textToAnalyze")
+    text_to_analyze = request.args.get("textToAnalyze")     
     emotions = emotion_detector(text_to_analyze)
     dominant_emotion = emotions["dominant_emotion"]
+
+    if dominant_emotion is None:
+        return "<B> Invalid text! Please try again!</B>"
+
     del emotions["dominant_emotion"]
     formated_emotions = ""
     for key in emotions.keys():
         formated_emotions += "\'" + key + "\': " +  str(emotions[key]) + ", "
     
-    formated_emotions = formated_emotions[:-2] + "."
-    message = f'For the given statement, the system response is {formated_emotions} The dominant emotion is <B>{dominant_emotion}</B>'
+    formated_emotions = formated_emotions[:-2] + ".  "
+    message = f'For the given statement, the system response is {formated_emotions}'
+    message = message + f'The dominant emotion is <B>{dominant_emotion}</B>'
 
     return message
 
 @app.route("/")
 def render_index_page():
-    """ This function initiates the rendering of the main application page over the Flask channel """
+    """ Loads index.hmtl """
 
     return render_template("index.html")
 
